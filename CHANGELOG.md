@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.43.1](https://github.com/mcp-telegram/mcp-telegram/compare/v1.43.0...v1.43.1) (2026-09-29)
+
+
+### Fixed
+
+* **client:** destroy GramJS clients instead of orphaning them on failed connect, disconnect and clearSession ([994229d](https://github.com/mcp-telegram/mcp-telegram/commit/994229d370ecbc8cb8f1dbe31b893f9f635dae57))
+
 ## [1.43.0](https://github.com/mcp-telegram/mcp-telegram/compare/v1.42.0...v1.43.0) (2026-09-21)
 
 
