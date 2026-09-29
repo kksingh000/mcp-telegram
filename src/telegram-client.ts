@@ -541,22 +541,24 @@ export class TelegramService {
         this.lastError = `Connection error: ${msg}`;
       }
 
-      try {
-        await this.client.disconnect();
-      } catch {
-        // Already on the connection-error path: a failing disconnect must not mask
-        // the original error recorded in this.lastError above.
-      }
-      this.client = null;
+      // destroy(), not disconnect(): GramJS only stops the client's update loop when
+      // `_destroyed` is set, and a merely disconnected client keeps pinging, failing and
+      // calling `_handleReconnect` -> getMe() forever. Before this fix the auth-error branch
+      // above had already nulled `this.client` (via clearSession), so the old
+      // `this.client.disconnect()` threw a swallowed TypeError and the client was never torn
+      // down at all: every revoked session left a zombie retrying AUTH_KEY_UNREGISTERED
+      // (users.GetUsers) against Telegram until the process restarted. dropDeadClient()
+      // swallows destroy() failures, so the lastError recorded above is never masked.
+      await this.dropDeadClient();
       return false;
     }
   }
 
   async clearSession(): Promise<void> {
-    this.connected = false;
+    // Destroy, never just drop the reference: an orphaned GramJS client keeps its update
+    // loop and auto-reconnect running with nobody left to stop it.
+    await this.dropDeadClient();
     this.sessionString = "";
-    this.client = null;
-    this.entityCache.clear();
     if (existsSync(this.sessionPath)) {
       await unlink(this.sessionPath);
     }
@@ -573,12 +575,10 @@ export class TelegramService {
   }
 
   async disconnect(): Promise<void> {
-    if (this.client && this.connected) {
-      await this.client.destroy();
-      this.connected = false;
-      this.client = null;
-      this.entityCache.clear();
-    }
+    // Tear the client down whatever the flag says. It used to require `this.connected`,
+    // but markUnhealthy() and a stale transport both clear the flag while leaving the
+    // client (and its update loop) alive, so disconnecting such a service leaked it.
+    await this.dropDeadClient();
   }
 
   /**
@@ -615,6 +615,8 @@ export class TelegramService {
     } catch (err) {
       console.error("[telegram] client.destroy failed during logOut:", err);
     }
+    // Already destroyed above — detach it so clearSession() does not destroy it twice.
+    this.client = null;
     await wipeLocalOrThrow();
     return revoked;
   }
