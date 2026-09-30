@@ -6,7 +6,7 @@ Issues and pull requests are welcome in any language. We answer in English, and 
 
 ## Where things are tracked
 
-- **Roadmap and priorities:** the public [mcp-telegram roadmap board](https://github.com/orgs/mcp-telegram/projects). Items marked `good first issue` or `help wanted` are open for contributors.
+- **Roadmap and priorities:** the public [mcp-telegram roadmap board](https://github.com/orgs/mcp-telegram/projects/1). Items marked `good first issue` or `help wanted` are open for contributors.
 - **Bugs and feature requests:** [issues](https://github.com/mcp-telegram/mcp-telegram/issues/new/choose).
 - **Questions and ideas:** [Discussions](https://github.com/mcp-telegram/mcp-telegram/discussions).
 - **Security problems:** never in a public issue. See [SECURITY.md](https://github.com/mcp-telegram/.github/blob/main/SECURITY.md).
